@@ -1,0 +1,4 @@
+Problem faced : 1. while using countdown timer, it was clicking only 8 images when I had the value as (5000, 500); so I increase it to (5500,500) because in countdowntimer if the remaining value is less than the interval tick will not be called.
+
+Future Plans :
+I want to extend this to videos.

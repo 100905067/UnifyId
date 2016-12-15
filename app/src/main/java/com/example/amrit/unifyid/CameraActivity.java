@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.MediaActionSound;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,16 +24,23 @@ import java.util.Date;
 public class CameraActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = CameraActivity.class.getSimpleName() ;
-    private static final int REQUEST_CAMERA_PERMISSION = 1;
+    private static final int REQUEST_CAMERA_PERMISSION = 200;
+    private MediaActionSound sound;
+    int count = 0;
+    TextView countTxt;
 
     private static String mCurrentPhotoPath;
         private Camera mCamera;
         private CameraPreview mPreview;
         static String TAG = MainActivity.class.getSimpleName();
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_camera);
+            countTxt = (TextView) findViewById(R.id.countTxt);
+
+            sound = new MediaActionSound();
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(CameraActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
@@ -43,6 +52,7 @@ public class CameraActivity extends AppCompatActivity {
                 mPreview = new CameraPreview(this, mCamera);
                 FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
                 preview.addView(mPreview);
+                mCamera.startPreview();
                 startTimer();
             }
         }
@@ -77,6 +87,15 @@ public class CameraActivity extends AppCompatActivity {
         public void capture() {
             Log.e(LOG_TAG,"captured image");
             mCamera.takePicture(null, null, mPicture);
+            sound.play(MediaActionSound.SHUTTER_CLICK);
+            mCamera.startPreview();
+
+            increamentCount();
+        }
+
+        public void increamentCount() {
+            count++;
+            countTxt.setText("Count ="+count);
         }
 
         //start timer
